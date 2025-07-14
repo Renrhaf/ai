@@ -15,6 +15,7 @@ use Symfony\AI\Agent\Agent;
 use Symfony\AI\Agent\Toolbox\AgentProcessor;
 use Symfony\AI\Agent\Toolbox\Tool\SimilaritySearch;
 use Symfony\AI\Agent\Toolbox\Toolbox;
+use Symfony\AI\Fixtures\Movies;
 use Symfony\AI\Platform\Bridge\Google\Embeddings;
 use Symfony\AI\Platform\Bridge\Google\Embeddings\TaskType;
 use Symfony\AI\Platform\Bridge\Google\Gemini;
@@ -42,18 +43,10 @@ $store = Store::fromDbal(
     connection: DriverManager::getConnection((new DsnParser())->parse($_SERVER['MARIADB_URI'])),
     tableName: 'my_table',
     indexName: 'my_index',
-    vectorFieldName: 'embedding',
 );
 
-// our data
-$movies = [
-    ['title' => 'Inception', 'description' => 'A skilled thief is given a chance at redemption if he can successfully perform inception, the act of planting an idea in someone\'s subconscious.', 'director' => 'Christopher Nolan'],
-    ['title' => 'The Matrix', 'description' => 'A hacker discovers the world he lives in is a simulated reality and joins a rebellion to overthrow its controllers.', 'director' => 'The Wachowskis'],
-    ['title' => 'The Godfather', 'description' => 'The aging patriarch of an organized crime dynasty transfers control of his empire to his reluctant son.', 'director' => 'Francis Ford Coppola'],
-];
-
 // create embeddings and documents
-foreach ($movies as $i => $movie) {
+foreach (Movies::all() as $i => $movie) {
     $documents[] = new TextDocument(
         id: Uuid::v4(),
         content: 'Title: '.$movie['title'].\PHP_EOL.'Director: '.$movie['director'].\PHP_EOL.'Description: '.$movie['description'],
